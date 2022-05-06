@@ -1,40 +1,30 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
+import { useFetchGifs } from '../hooks/useFetchGifs';
+import GifGridItem from './GifGridItem';
 
-const GifGrid = ({category}) => {
 
-    const [images, setImages] = useState([]);
-    
-    useEffect(()=> {
-        getGifs();
-    }, [])
+const GifGrid = ({ category }) => {
 
-    const getGifs = async()=> {
+    const { data:images, loading } = useFetchGifs( category );
 
-        const url = `https://api.giphy.com/v1/gifs/search?q=rick+and+morty&limit=10&api_key=Qy82VZZQ28YhxeBI89I5wozdXYk1WPvp`
-        const response = await fetch(url);
-        const {data} = await response.json();
+    return (
+        <>
+            <h3 className='animate__animated animate__fadeIn'>{ category }</h3>
 
-        const gifs = data.map( img => {
-            return {
-                id: img.id,
-                title: img.title,
-                url: img.images?.downsized_medium.url
-            }
-        } )
+            { loading && <p className='animate__animated animate__fadeIn'>Cargando</p> }
 
-        console.log(gifs)
-        setImages( gifs )
-        
-    }
-
-  return (
-    <div>
-        <h3>{ category }</h3>
-        <ol>
-            {images.map(({id, title}) => <li key={ id }> { title } </li>)}
-        </ol>
-    </div>
-  )
+           { <div className='card-grid'>
+                    {
+                        images.map( img => (
+                            <GifGridItem 
+                                key={ img.id }
+                                { ...img }
+                            />
+                        ))
+                    }
+            </div>}
+        </>
+    )
 }
 
 export default GifGrid
